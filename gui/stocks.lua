@@ -65,7 +65,7 @@ function StocksWindow:init()
                     frame = {t = 3, l = 0},
                     view_id = "item_count_label"
                 },
-                widgets.List{
+                widgets.FilteredList{
                     view_id = "item_list",
                     frame = {t = 4, b = 1, l = 1, r = 1},
                     text_pen = {fg = COLOR_GREY, bg = COLOR_BLACK},
@@ -488,36 +488,35 @@ function StocksWindow:filter_list(filter)
 
         local wear_tags = {"", "x", "X", "XX"}
 
-        if not filter or #filter < 1 or string.match(string.lower(v.desc), filter) then
-            local full_item_desc
-            if item:getWear() > 0 then
-                local wear_tag = wear_tags[item:getWear() + 1]
-                full_item_desc = wear_tag .. v.desc .. wear_tag
-            else
-                full_item_desc = v.desc
-            end
-
-            table.insert(list_contents, {
-                text = {
-                    {text = full_item_desc, width = item_desc_width, rjustify = false, pad_char = ' '}, ' ',
-                    {text = job_char, width = 1, pen = COLOR_LIGHTBLUE},
-                    {text = rotten_char, width = 1, pen = COLOR_CYAN},
-                    {text = owned_char, width = 1, pen = COLOR_GREEN},
-                    {text = forbidden_char, width = 1, pen = COLOR_RED},
-                    {text = dump_char, width = 1, pen = COLOR_LIGHTMAGENTA},
-                    {text = on_fire_char, width = 1, pen = COLOR_LIGHTRED},
-                    {text = melt_char, width = 1, pen = COLOR_BLUE},
-                    {text = in_inv_char, width = 1, pen = COLOR_WHITE}, "   ",
-                    {text = quality_label, width = 13, rjustify = false, pad_char = ' ', pen = quality_pen},
-                },
-                ref = v.ref,
-            })
+        local full_item_desc
+        if item:getWear() > 0 then
+            local wear_tag = wear_tags[item:getWear() + 1]
+            full_item_desc = wear_tag .. v.desc .. wear_tag
+        else
+            full_item_desc = v.desc
         end
+
+        table.insert(list_contents, {
+            text = {
+                {text = full_item_desc, width = item_desc_width, rjustify = false, pad_char = ' '}, ' ',
+                {text = job_char, width = 1, pen = COLOR_LIGHTBLUE},
+                {text = rotten_char, width = 1, pen = COLOR_CYAN},
+                {text = owned_char, width = 1, pen = COLOR_GREEN},
+                {text = forbidden_char, width = 1, pen = COLOR_RED},
+                {text = dump_char, width = 1, pen = COLOR_LIGHTMAGENTA},
+                {text = on_fire_char, width = 1, pen = COLOR_LIGHTRED},
+                {text = melt_char, width = 1, pen = COLOR_BLUE},
+                {text = in_inv_char, width = 1, pen = COLOR_WHITE}, "   ",
+                {text = quality_label, width = 13, rjustify = false, pad_char = ' ', pen = quality_pen},
+            },
+            ref = v.ref,
+        })
 
         ::continue::
     end
 
     self.subviews.item_list:setChoices(list_contents)
+    self.subviews.item_list:setFilter(filter)
     self.subviews.item_count_label:setText(string.format("Items: %d", #list_contents))
     self.subviews.actions_item_count_label:setText{
         {text = "Actions (", pen = COLOR_BROWN}, {text = tostring(#list_contents), pen = COLOR_LIGHTGREEN}, {text = " Items)", pen = COLOR_BROWN}
